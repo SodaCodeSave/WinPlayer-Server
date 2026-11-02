@@ -15,7 +15,7 @@ import ServerSettings from "./views/ServerSettings.vue";
 
 const authed = ref(Boolean(session.token));
 const me = ref<AdminUser | null>(null);
-const serverName = ref("WinPlayer 音乐云");
+const serverName = ref("WinPlayer 同频服务器");
 const tab = ref("overview");
 
 const loginName = ref("");
@@ -78,7 +78,7 @@ onMounted(boot);
 <template>
   <div v-if="!authed" class="login-wrap">
     <form class="login-card" @submit.prevent="login">
-      <h1>WinPlayer 音乐云</h1>
+      <h1>WinPlayer 同频服务器</h1>
       <p class="hint">后台管理 · 用管理员账号登录</p>
       <div class="field">
         <label>用户名</label>
@@ -103,7 +103,7 @@ onMounted(boot);
   <div v-else class="shell">
     <aside class="sidebar">
       <div class="brand">
-        <span>音乐云</span>
+        <span>同频服务器</span>
         <small>{{ serverName }}</small>
       </div>
       <button

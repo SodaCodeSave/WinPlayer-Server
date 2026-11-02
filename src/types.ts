@@ -5,7 +5,7 @@
  * `docs/API.md` 里逐字段说明；两边改动必须同步。
  */
 
-/** 音乐云里的一首曲目（不含二进制内容） */
+/** 同频服务器里的一首曲目（不含二进制内容） */
 export interface CloudTrack {
   /** 内容哈希（同时也是客户端里的 track_id，跨设备稳定） */
   hash: string;

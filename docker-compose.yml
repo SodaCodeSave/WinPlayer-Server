@@ -1,4 +1,4 @@
-# WinPlayer 音乐云：一条命令起服务
+# WinPlayer 同频服务器：一条命令起服务
 #
 #   docker compose up -d             # 只用 HTTP（局域网 / 已有反代）
 #   DOMAIN=music.example.com docker compose --profile https up -d   # 自动 HTTPS

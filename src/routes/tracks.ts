@@ -307,7 +307,7 @@ export async function trackRoutes(app: FastifyInstance): Promise<void> {
     return { ok: true };
   });
 
-  /** 回收站（客户端「音乐云」页可以列出来恢复） */
+  /** 回收站（客户端「同频服务器」页可以列出来恢复） */
   app.get("/api/tracks/trash", { preHandler: requireAuth }, async (req) => {
     const user = req.user!;
     const rows = db

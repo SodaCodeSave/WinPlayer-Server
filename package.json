@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "WinPlayer 的音乐云与账号数据同步服务端",
+  "description": "WinPlayer 的同频服务器与账号数据同步服务端",
   "license": "MIT",
   "engines": {
     "node": ">=22"

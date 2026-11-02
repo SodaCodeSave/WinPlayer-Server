@@ -50,7 +50,7 @@ export async function adminRoutes(app: FastifyInstance): Promise<void> {
       trashCount: trash.n,
       diskBytes: await dirSize(env.dataDir),
       cursor: currentSeq(),
-      serverName: getServerSetting("server_name", "WinPlayer 音乐云"),
+      serverName: getServerSetting("server_name", "WinPlayer 同频服务器"),
       registrationOpen: getServerFlag("registration_open", false),
       inviteRequired: getServerFlag("invite_required", false),
       quotaBytes: env.userQuotaBytes,
@@ -160,7 +160,7 @@ export async function adminRoutes(app: FastifyInstance): Promise<void> {
   /* ------------------------------ 服务器设置 ------------------------------ */
 
   app.get("/api/admin/settings", { preHandler: requireAdmin }, async () => ({
-    serverName: getServerSetting("server_name", "WinPlayer 音乐云"),
+    serverName: getServerSetting("server_name", "WinPlayer 同频服务器"),
     registrationOpen: getServerFlag("registration_open", false),
     inviteRequired: getServerFlag("invite_required", false),
     quotaBytes: env.userQuotaBytes,
@@ -183,7 +183,7 @@ export async function adminRoutes(app: FastifyInstance): Promise<void> {
       setServerSetting("invite_required", body.inviteRequired ? "1" : "0");
     }
     return {
-      serverName: getServerSetting("server_name", "WinPlayer 音乐云"),
+      serverName: getServerSetting("server_name", "WinPlayer 同频服务器"),
       registrationOpen: getServerFlag("registration_open", false),
       inviteRequired: getServerFlag("invite_required", false),
     };

@@ -1,4 +1,4 @@
-# WinPlayer 音乐云 API
+# WinPlayer 同频服务器 API
 
 客户端（`src/services/cloud.ts`）与本服务端共用的接口合同。**任何一侧改动都必须同步这份文档。**
 
@@ -15,7 +15,7 @@
 
 ```json
 {
-  "name": "WinPlayer 音乐云",
+  "name": "WinPlayer 同频服务器",
   "version": 1,
   "registrationOpen": false,
   "inviteRequired": false,

@@ -40,7 +40,7 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
   /** 服务器公开信息（客户端登录前要拿它显示服务器名 / 是否可注册） */
   app.get("/api/server/info", async () => {
     return {
-      name: getServerSetting("server_name", "WinPlayer 音乐云"),
+      name: getServerSetting("server_name", "WinPlayer 同频服务器"),
       version: 1,
       registrationOpen: getServerFlag("registration_open", false),
       inviteRequired: getServerFlag("invite_required", false),
@@ -102,7 +102,7 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
         );
       }
     } else if (!getServerSetting("server_name", "")) {
-      setServerSetting("server_name", "WinPlayer 音乐云");
+      setServerSetting("server_name", "WinPlayer 同频服务器");
     }
 
     const user = db.prepare("select * from users where id = ?").get(userId) as UserRow;
@@ -152,7 +152,7 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
     return {
       user: publicUser(user),
       server: {
-        name: getServerSetting("server_name", "WinPlayer 音乐云"),
+        name: getServerSetting("server_name", "WinPlayer 同频服务器"),
         registrationOpen: getServerFlag("registration_open", false),
       },
     };
