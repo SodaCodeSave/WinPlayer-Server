@@ -24,12 +24,27 @@ ENV NODE_ENV=production \
     PORT=3456 \
     HOST=0.0.0.0
 WORKDIR /app
+
+# gosu 只做一件事：在入口脚本里从 root 降权到 node 后 exec。
+# 用它而不是 su/sudo，是因为它能正确转发信号，容器 stop 时 node 能收到 SIGTERM。
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends gosu \
+ && rm -rf /var/lib/apt/lists/*
+
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/web/dist ./web/dist
 COPY package.json ./
-RUN mkdir -p /data && chown -R node:node /data
-USER node
+COPY docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+# 镜像内先建好并交给 node；但 ./data 绑定挂载会覆盖它，
+# 所以真正的权限校正放在入口脚本里做（见 docker/entrypoint.sh 注释）。
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
+ && mkdir -p /data \
+ && chown -R node:node /data
+
+# 刻意不写 USER：入口脚本需要 root 才能修正被挂载目录的属主，
+# 修正完立刻 gosu node 降权，实际业务进程始终是 uid 1000。
 VOLUME ["/data"]
 EXPOSE 3456
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["node", "dist/index.js"]

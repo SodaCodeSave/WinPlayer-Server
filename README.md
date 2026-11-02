@@ -75,6 +75,33 @@ git pull && docker compose up -d --build
 
 ---
 
+## 常见问题
+
+**启动即退出，日志里有 `EACCES: permission denied, mkdir '/data/music'`**
+
+数据目录的属主和容器内的运行用户对不上。`./data:/data` 是绑定挂载，会盖掉镜像里对 `/data` 的 `chown`，而宿主机上的 `./data` 通常是 root 建的，容器里的进程却是 uid 1000 的 `node`。
+
+当前镜像的入口脚本会**在启动时自动修正一次**（只在属主不对时执行，不会每次重启都全盘 `chown`）。如果你是从旧镜像升上来的，重新构建即可：
+
+```bash
+docker compose down && docker compose up -d --build
+```
+
+仍然报错时，说明目录被挂成了只读，或你在 compose 里写了 `user:`：
+
+```bash
+# 看实际属主
+ls -ld data data/music
+# 手动交给 uid 1000（容器里的 node）
+sudo chown -R 1000:1000 data
+```
+
+> 不想让宿主机文件变成 uid 1000 的，也可以反过来：在 compose 里加
+> `user: "$(id -u):$(id -g)"`，并保证该用户对自己建的 `./data` 可写。
+> 这种情况下入口脚本检测到非 root 会直接透传命令，不再改权限。
+
+---
+
 ## 本地开发
 
 ```bash
@@ -104,6 +131,7 @@ src/
   routes/           auth · tracks · sync · admin
   media/            内容寻址存储、music-metadata 解析
 web/                后台 UI（Vue 3 + Vite）
+docker/entrypoint.sh  容器入口：修正挂载目录属主后降权到 node
 docs/API.md         接口合同（客户端与服务端共用）
 scripts/smoke.mjs   端到端冒烟测试
 ```

@@ -27,6 +27,8 @@ services:
       # 反向代理对外地址（生成直链时用），留空按请求头推断
       PUBLIC_URL: "${PUBLIC_URL:-}"
     volumes:
+      # 数据库 + 音频 + 封面全在这里。绑定挂载会盖掉镜像里对 /data 的 chown，
+      # 容器入口脚本会在启动时把属主修正给 node（仅首次，之后跳过）。
       - ./data:/data
     healthcheck:
       test:

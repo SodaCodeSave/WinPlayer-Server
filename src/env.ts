@@ -37,5 +37,23 @@ export const env = {
 };
 
 for (const dir of [env.dataDir, env.musicDir, env.coverDir, env.tmpDir]) {
-  fs.mkdirSync(dir, { recursive: true });
+  try {
+    fs.mkdirSync(dir, { recursive: true });
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code !== "EACCES" && code !== "EPERM" && code !== "EROFS") throw error;
+    // 这类错误一律是「数据目录不可写」，给一条能直接照做的提示，
+    // 而不是把一段 Node 内部栈甩给运维
+    throw new Error(
+      [
+        `数据目录不可写：${dir}`,
+        ``,
+        `容器部署：确认挂载的是可写目录（./data:/data），且没有在 compose 里把 user 设成无权写该目录的账号。`,
+        `官方镜像会在启动时自动把 /data 交给 node 用户；若你改过 entrypoint 或 user，请确保 uid 1000 对挂载目录有写权限。`,
+        `宿主机手动修正：sudo chown -R 1000:1000 ./data`,
+        ``,
+        `裸机部署：把 DATA_DIR 指向可写目录，或修正其属主：sudo chown -R $(id -u):$(id -g) <DATA_DIR>`,
+      ].join("\n"),
+    );
+  }
 }
