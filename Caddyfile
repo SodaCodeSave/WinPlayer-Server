@@ -1,0 +1,9 @@
+# 由 docker-compose 的 https profile 使用；DOMAIN 从环境变量读
+{$DOMAIN:localhost} {
+	encode zstd gzip
+	# 上传最大 600MB（与 MAX_UPLOAD_MB 对齐，留一点余量）
+	request_body {
+		max_size 600MB
+	}
+	reverse_proxy server:3456
+}

@@ -1,0 +1,65 @@
+# WinPlayer 音乐云：一条命令起服务
+#
+#   docker compose up -d             # 只用 HTTP（局域网 / 已有反代）
+#   DOMAIN=music.example.com docker compose --profile https up -d   # 自动 HTTPS
+#
+# 数据全部在 ./data（数据库 + music/ + covers/），备份它就等于备份整个服务器。
+
+services:
+  server:
+    build: .
+    image: winplayer-server:latest
+    container_name: winplayer-server
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3456}:3456"
+    environment:
+      TZ: "${TZ:-Asia/Shanghai}"
+      # 单账号容量上限（MB），0 表示不限
+      USER_QUOTA_MB: "${USER_QUOTA_MB:-0}"
+      # 单次上传上限（MB）
+      MAX_UPLOAD_MB: "${MAX_UPLOAD_MB:-512}"
+      # 是否默认开放注册（0/1）。首个注册的账号永远是管理员，不受此开关限制。
+      REGISTRATION_OPEN: "${REGISTRATION_OPEN:-0}"
+      # 签名密钥：留空则首次启动随机生成并保存到 /data/secret.key
+      # 多实例/迁移时请显式指定，否则所有登录态会失效
+      SECRET: "${SECRET:-}"
+      # 反向代理对外地址（生成直链时用），留空按请求头推断
+      PUBLIC_URL: "${PUBLIC_URL:-}"
+    volumes:
+      - ./data:/data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3456/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  # 可选：Caddy 自动申请并续期 HTTPS 证书
+  # 用法：DOMAIN=music.example.com docker compose --profile https up -d
+  caddy:
+    image: caddy:2-alpine
+    container_name: winplayer-caddy
+    restart: unless-stopped
+    profiles: ["https"]
+    depends_on:
+      - server
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: "${DOMAIN:-localhost}"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  caddy-data:
+  caddy-config:
