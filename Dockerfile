@@ -38,7 +38,10 @@ COPY package.json ./
 COPY docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 # 镜像内先建好并交给 node；但 ./data 绑定挂载会覆盖它，
 # 所以真正的权限校正放在入口脚本里做（见 docker/entrypoint.sh 注释）。
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
+# sed 是防御性的：仓库在 Windows 上检出时可能带 CRLF，带 \r 的 shebang
+# 在容器里会直接报 “bad interpreter: /bin/sh^M”。
+RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh \
+ && chmod +x /usr/local/bin/docker-entrypoint.sh \
  && mkdir -p /data \
  && chown -R node:node /data
 

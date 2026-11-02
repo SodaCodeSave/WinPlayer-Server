@@ -1,0 +1,11 @@
+# 仓库在 Windows 上开发、在 Linux 容器里构建。
+# core.autocrlf=true 会把 checkout 出来的脚本转成 CRLF，
+# 而带 CRLF 的 shebang 在 Linux 容器里会报 “bad interpreter: /bin/sh^M”。
+# 这些文件必须始终保持 LF。
+*.sh                text eol=lf
+Dockerfile          text eol=lf
+*.dockerfile        text eol=lf
+.dockerignore       text eol=lf
+*.yml               text eol=lf
+*.yaml              text eol=lf
+Caddyfile           text eol=lf
